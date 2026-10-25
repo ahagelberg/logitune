@@ -70,7 +70,14 @@ ApplicationWindow {
     onHeightChanged: if (height < minimumHeight) height = minimumHeight
 
     visible: true
-    title: "Logitune"
+    // Window title (taskbar / WM) and the custom title-bar label: version
+    // always, plus the git branch for builds made from a checkout.
+    readonly property string _gitBranch:
+        typeof AppGitBranch !== "undefined" ? AppGitBranch : ""
+    readonly property string windowTitle:
+        "Logitune v" + Qt.application.version
+            + (_gitBranch.length > 0 ? " (" + _gitBranch + ")" : "")
+    title: windowTitle
     color: Theme.background
     flags: Qt.FramelessWindowHint | Qt.Window
 
@@ -105,7 +112,7 @@ ApplicationWindow {
         // App title
         Text {
             anchors { left: parent.left; leftMargin: 16; verticalCenter: parent.verticalCenter }
-            text: "Logitune"
+            text: root.windowTitle
             font.pixelSize: 12
             color: Theme.textSecondary
         }

@@ -178,6 +178,11 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     qCInfo(lcApp) << "QML engine created";
 
+    // Build metadata for the window title. The branch is empty for release
+    // tarballs and detached-HEAD builds, so the title degrades to the version.
+    engine.rootContext()->setContextProperty(QStringLiteral("AppGitBranch"),
+                                             QStringLiteral(GIT_BRANCH));
+
     class IconProvider : public QQuickImageProvider {
     public:
         IconProvider() : QQuickImageProvider(QQuickImageProvider::Pixmap) {}

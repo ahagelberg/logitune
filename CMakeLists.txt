@@ -54,6 +54,24 @@ set(_logitune_numeric "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
 if(NOT DEFINED LOGITUNE_DISPLAY_VERSION)
     set(LOGITUNE_DISPLAY_VERSION "${LOGITUNE_VERSION}")
 endif()
+
+# Development-build marker: the checked-out branch, shown next to the version
+# in the window title so a local build is identifiable. Source-tarball builds
+# (AUR, OBS) and detached-HEAD CI checkouts leave this empty.
+set(LOGITUNE_GIT_BRANCH "")
+if(Git_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE _git_branch
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        RESULT_VARIABLE _git_branch_rc
+    )
+    if(_git_branch_rc EQUAL 0 AND NOT _git_branch STREQUAL "HEAD")
+        set(LOGITUNE_GIT_BRANCH "${_git_branch}")
+    endif()
+endif()
 set(LOGITUNE_VERSION "${_logitune_numeric}")
 
 project(logitune VERSION ${LOGITUNE_VERSION} LANGUAGES CXX)
