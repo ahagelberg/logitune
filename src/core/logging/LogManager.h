@@ -21,7 +21,8 @@ public:
     static LogManager &instance();
 
     /// Initialize logging. Call once before any logging happens.
-    /// If debugMode is true, all categories enabled regardless of settings.
+    /// File logging is always enabled; debugMode additionally raises the
+    /// console verbosity to include debug/info (debug builds only).
     void init(bool debugMode = false);
 
     /// Enable/disable debug logging at runtime (from Settings toggle).
@@ -61,6 +62,7 @@ private:
     QMutex m_mutex;
     QFile m_logFile;
     bool m_enabled = false;
+    bool m_debugMode = false;
     bool m_initialized = false;
     QString m_previousLogPath;
 };

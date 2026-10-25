@@ -98,9 +98,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Initialize logging — enabled by default, user can disable in Settings
+    // Initialize logging — enabled by default, user can disable in Settings.
+    // Debug-level console output is a development affordance: debug builds
+    // keep it, release builds log info to file and stay quiet.
     auto &logMgr = logitune::LogManager::instance();
-    logMgr.init(true);
+#ifdef NDEBUG
+    constexpr bool debugLogging = false;
+#else
+    constexpr bool debugLogging = true;
+#endif
+    logMgr.init(debugLogging);
 
     // Use INI format explicitly — avoids dconf/GSettings hangs on GNOME
     QSettings::setDefaultFormat(QSettings::IniFormat);

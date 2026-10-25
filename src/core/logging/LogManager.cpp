@@ -30,6 +30,7 @@ void LogManager::init(bool debugMode)
 {
     if (m_initialized) return;
     m_initialized = true;
+    m_debugMode = debugMode;
 
     QDir().mkpath(logDir());
     rotateLogFiles();
@@ -43,9 +44,9 @@ void LogManager::init(bool debugMode)
     // Install our message handler
     qInstallMessageHandler(LogManager::messageHandler);
 
-    if (debugMode) {
-        setLoggingEnabled(true);
-    }
+    // File logging is on by default in every build (info and above);
+    // debug-level verbosity is supplied by m_debugMode.
+    setLoggingEnabled(true);
 }
 
 void LogManager::setLoggingEnabled(bool enabled)
@@ -53,22 +54,20 @@ void LogManager::setLoggingEnabled(bool enabled)
     m_enabled = enabled;
 
     if (enabled) {
-        QLoggingCategory::setFilterRules(QStringLiteral(
-            "logitune.app.debug=true\n"
-            "logitune.app.info=true\n"
-            "logitune.profile.debug=true\n"
-            "logitune.profile.info=true\n"
-            "logitune.device.debug=true\n"
-            "logitune.device.info=true\n"
-            "logitune.hidpp.debug=true\n"
-            "logitune.hidpp.info=true\n"
-            "logitune.input.debug=true\n"
-            "logitune.input.info=true\n"
-            "logitune.focus.debug=true\n"
-            "logitune.focus.info=true\n"
-            "logitune.ui.debug=true\n"
-            "logitune.ui.info=true\n"
-        ));
+        // Every category logs info; debug-level output is a development
+        // affordance, so it follows the build type rather than the toggle.
+        const QString debugFlag = m_debugMode ? QStringLiteral("true")
+                                              : QStringLiteral("false");
+        QString rules;
+        for (const char *category : {"logitune.app", "logitune.profile",
+                                     "logitune.device", "logitune.hidpp",
+                                     "logitune.input", "logitune.focus",
+                                     "logitune.ui"}) {
+            const QString name = QString::fromLatin1(category);
+            rules += name + QStringLiteral(".info=true\n");
+            rules += name + QStringLiteral(".debug=") + debugFlag + QLatin1Char('\n');
+        }
+        QLoggingCategory::setFilterRules(rules);
 
         // Open log file
         if (!m_logFile.isOpen()) {
@@ -101,6 +100,13 @@ QString LogManager::previousLogPath() const
     return m_previousLogPath;
 }
 
+static bool isWarningOrWorse(QtMsgType type)
+{
+    // QtMsgType is not ordered by severity — QtInfoMsg comes *after*
+    // QtFatalMsg — so info must be excluded explicitly.
+    return type == QtWarningMsg || type == QtCriticalMsg || type == QtFatalMsg;
+}
+
 void LogManager::messageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)
 {
     // Level string
@@ -123,12 +129,14 @@ void LogManager::messageHandler(QtMsgType type, const QMessageLogContext &ctx, c
     QString formatted = QStringLiteral("[%1] [%2] [%3] %4")
         .arg(timestamp, category.leftJustified(18), QString::fromUtf8(level).leftJustified(5), msg);
 
-    // Always write to stderr
-    fprintf(stderr, "%s\n", qPrintable(formatted));
+    // Console output: debug/info only for debug builds, so installed release
+    // binaries stay quiet when launched from a desktop session or a terminal.
+    auto &mgr = instance();
+    if (mgr.m_debugMode || isWarningOrWorse(type))
+        fprintf(stderr, "%s\n", qPrintable(formatted));
 
     // Write to file if enabled (or always for warnings+)
-    auto &mgr = instance();
-    if (mgr.m_enabled || type >= QtWarningMsg) {
+    if (mgr.m_enabled || isWarningOrWorse(type)) {
         mgr.writeToFile(formatted);
     }
 }
