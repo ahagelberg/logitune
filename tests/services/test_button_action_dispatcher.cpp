@@ -10,6 +10,7 @@ constexpr uint16_t kGestureCid     = 0x00C3; // button index 5, "gesture-trigger
 constexpr uint16_t kBackCid        = 0x0053; // button index 3
 constexpr uint16_t kForwardCid     = 0x0056; // button index 4
 constexpr uint16_t kMiddleCid      = 0x0052; // button index 2
+constexpr uint16_t kShiftWheelCid  = 0x00C4; // button index 6
 
 /// Write a button action into the cached hardware profile at the given
 /// buttonIndex. The dispatcher reads from that profile on press.
@@ -235,6 +236,19 @@ TEST_F(ButtonActionDispatcherFixture, DpiCycleButtonDoesNotInjectKeystroke) {
     // cycleDpi() writes to the session; no executor path. Verify we didn't
     // accidentally fall into the keystroke branch.
     m_dispatcher->onDivertedButtonPressed(kBackCid, true);
+    EXPECT_FALSE(m_injector->hasCalled("injectKeystroke"));
+}
+
+TEST_F(ButtonActionDispatcherFixture, MiddleClickActionInjectsMouseClick) {
+    // A button remapped to "Middle click" (e.g. the shift-wheel button) must
+    // inject a pointer button click rather than falling through to the
+    // device's native behaviour.
+    attachMockSession();
+    setProfileButton(hwProfile(), 6,
+        ButtonAction{ButtonAction::MiddleClick, {}});
+
+    m_dispatcher->onDivertedButtonPressed(kShiftWheelCid, true);
+    EXPECT_TRUE(m_injector->hasCalled("injectMiddleClick"));
     EXPECT_FALSE(m_injector->hasCalled("injectKeystroke"));
 }
 

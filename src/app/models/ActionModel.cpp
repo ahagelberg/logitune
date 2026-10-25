@@ -35,7 +35,7 @@ ActionModel::ActionModel(QObject *parent)
         // Other
         { "Do nothing",            "Button is disabled",                         "none",              "",                  "Other" },
         { "Keyboard shortcut",     "Send a custom key combination",              "keystroke",         "",                  "Other" },
-        { "Middle click",          "Emulate middle mouse button click",          "default",           "",                  "Other" },
+        { "Middle click",          "Emulate middle mouse button click",          "middle-click",      "",                  "Other" },
 
         // System
         { "Brightness down",       "Decrease display brightness",                "keystroke",         "BrightnessDown",    "System" },
@@ -152,6 +152,8 @@ ButtonAction ActionModel::buttonEntryToAction(const QString &actionType, const Q
         return {ButtonAction::SmartShiftToggle, {}};
     if (actionType == QStringLiteral("dpi-cycle"))
         return {ButtonAction::DpiCycle, {}};
+    if (actionType == QStringLiteral("middle-click"))
+        return {ButtonAction::MiddleClick, {}};
     if (actionType == QStringLiteral("keystroke")) {
         QString payload = payloadForName(actionName);
         if (payload.isEmpty() && actionName != QStringLiteral("Keyboard shortcut"))

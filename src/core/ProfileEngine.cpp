@@ -26,6 +26,9 @@ ButtonAction ButtonAction::parse(const QString &str)
     if (str == "dpi-cycle")
         return {DpiCycle, {}};
 
+    if (str == "middle-click")
+        return {MiddleClick, {}};
+
     // Prefixed forms: "type:payload"
     const int colon = str.indexOf(':');
     if (colon == -1)
@@ -54,6 +57,7 @@ QString ButtonAction::serialize() const
     case GestureTrigger:  return "gesture-trigger";
     case SmartShiftToggle: return "smartshift-toggle";
     case DpiCycle:      return "dpi-cycle";
+    case MiddleClick:   return "middle-click";
     case Keystroke:     return "keystroke:" + payload;
     case Media:         return "media:" + payload;
     case DBus:          return "dbus:" + payload;

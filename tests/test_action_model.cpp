@@ -141,8 +141,16 @@ TEST_F(ActionModelTest, ButtonActionToNameForAppLaunch) {
 // ---------------------------------------------------------------------------
 
 TEST_F(ActionModelTest, ButtonEntryToActionDefault) {
-    auto ba = model.buttonEntryToAction(QStringLiteral("default"), QStringLiteral("Middle click"));
+    auto ba = model.buttonEntryToAction(QStringLiteral("default"), QStringLiteral("Back"));
     EXPECT_EQ(ba.type, ButtonAction::Default);
+    EXPECT_TRUE(ba.payload.isEmpty());
+}
+
+TEST_F(ActionModelTest, ButtonEntryToActionMiddleClick) {
+    // The picker's "Middle click" entry must map to a real injectable action,
+    // not to `Default` (which would leave the button on its hardware role).
+    auto ba = model.buttonEntryToAction(QStringLiteral("middle-click"), QStringLiteral("Middle click"));
+    EXPECT_EQ(ba.type, ButtonAction::MiddleClick);
     EXPECT_TRUE(ba.payload.isEmpty());
 }
 

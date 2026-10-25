@@ -549,3 +549,22 @@ TEST_F(AppRootFixture, SmartShiftButtonUpdatesUiAndActiveProfile) {
     EXPECT_EQ(p.smartShiftEnabled, after)
         << "toggled SmartShift was not persisted into the active profile";
 }
+
+// Regression guard: assigning the "Middle click" picker entry to the shift
+// wheel button used to store a `Default` action, which un-diverted the button
+// and let the firmware toggle SmartShift instead. It must persist as a real
+// middle-click action and dispatch a pointer click on press.
+TEST_F(AppRootFixture, MiddleClickOnShiftWheelButtonPersistsAndDispatches) {
+    buttonModel().setAction(6, QStringLiteral("Middle click"),
+                            QStringLiteral("middle-click"));
+
+    const Profile &p = profileEngine().cachedProfile(QStringLiteral("mock-serial"),
+                                                     QStringLiteral("default"));
+    ASSERT_EQ(p.buttons[6].type, ButtonAction::MiddleClick)
+        << "Middle click assignment was not persisted as a middle-click action";
+    EXPECT_EQ(buttonModel().actionTypeForButton(6), QStringLiteral("middle-click"));
+
+    pressButton(0x00C4);
+    releaseButton(0x00C4);
+    EXPECT_TRUE(m_injector->hasCalled("injectMiddleClick"));
+}

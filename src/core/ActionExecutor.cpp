@@ -82,6 +82,11 @@ void ActionExecutor::injectKeystroke(const QString &combo)
     m_injector->injectKeystroke(combo);
 }
 
+void ActionExecutor::injectMiddleClick()
+{
+    m_injector->injectMiddleClick();
+}
+
 void ActionExecutor::injectCtrlScroll(int direction)
 {
     m_injector->injectCtrlScroll(direction);

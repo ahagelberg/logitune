@@ -133,6 +133,8 @@ void ButtonActionDispatcher::onDivertedButtonPressed(uint16_t controlId, bool pr
     } else if ((ba.type == ButtonAction::Keystroke || ba.type == ButtonAction::Media)
                && !ba.payload.isEmpty()) {
         m_actionExecutor->injectKeystroke(ba.payload);
+    } else if (ba.type == ButtonAction::MiddleClick) {
+        m_actionExecutor->injectMiddleClick();
     } else if (ba.type == ButtonAction::GestureTrigger) {
         state.gestureAccumX = 0;
         state.gestureAccumY = 0;

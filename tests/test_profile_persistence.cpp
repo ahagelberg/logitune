@@ -47,6 +47,7 @@ TEST_F(ProfilePersistenceTest, AllButtonActionTypesSurviveRoundTrip) {
     p.buttons[2] = {ButtonAction::GestureTrigger, {}};
     p.buttons[3] = {ButtonAction::SmartShiftToggle, {}};
     p.buttons[4] = {ButtonAction::AppLaunch, "kcalc"};
+    p.buttons[6] = {ButtonAction::MiddleClick, {}};
 
     QString path = tmpPath() + "/roundtrip.conf";
     ProfileEngine::saveProfile(path, p);
@@ -57,6 +58,7 @@ TEST_F(ProfilePersistenceTest, AllButtonActionTypesSurviveRoundTrip) {
     EXPECT_EQ(loaded.buttons[2], p.buttons[2]);
     EXPECT_EQ(loaded.buttons[3], p.buttons[3]);
     EXPECT_EQ(loaded.buttons[4], p.buttons[4]);
+    EXPECT_EQ(loaded.buttons[6], p.buttons[6]);
 }
 
 TEST_F(ProfilePersistenceTest, AppBindingsRoundTrip) {

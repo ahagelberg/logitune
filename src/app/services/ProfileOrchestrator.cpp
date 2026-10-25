@@ -282,6 +282,10 @@ void ProfileOrchestrator::restoreButtonModelFromProfile(const Profile &p)
             aType = QStringLiteral("dpi-cycle");
             aName = QStringLiteral("DPI cycle");
             break;
+        case ButtonAction::MiddleClick:
+            aType = QStringLiteral("middle-click");
+            aName = QStringLiteral("Middle click");
+            break;
         case ButtonAction::Keystroke:
             aType = QStringLiteral("keystroke");
             aName = m_actionModel->buttonActionToName(ba);

@@ -43,6 +43,22 @@ TEST(ButtonAction, SerializeDpiCycleType) {
     EXPECT_EQ(a.serialize(), "dpi-cycle");
 }
 
+TEST(ButtonAction, ParseMiddleClickKeyword) {
+    auto a = ButtonAction::parse("middle-click");
+    EXPECT_EQ(a.type, ButtonAction::MiddleClick);
+    EXPECT_TRUE(a.payload.isEmpty());
+}
+
+TEST(ButtonAction, SerializeMiddleClickType) {
+    ButtonAction a{ButtonAction::MiddleClick, {}};
+    EXPECT_EQ(a.serialize(), "middle-click");
+}
+
+TEST(ButtonAction, RoundTripMiddleClick) {
+    ButtonAction a{ButtonAction::MiddleClick, {}};
+    EXPECT_EQ(ButtonAction::parse(a.serialize()), a);
+}
+
 TEST(ButtonAction, ParseKeystrokeCtrlC) {
     auto a = ButtonAction::parse("keystroke:Ctrl+C");
     EXPECT_EQ(a.type, ButtonAction::Keystroke);

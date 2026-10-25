@@ -10,6 +10,7 @@ struct ButtonAction {
         GestureTrigger,
         SmartShiftToggle,
         DpiCycle,
+        MiddleClick,
         AppLaunch,
         DBus,
         Media,

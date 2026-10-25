@@ -44,6 +44,11 @@ bool UinputInjector::init()
     ::ioctl(m_uinputFd, UI_SET_EVBIT, EV_REL);
     ::ioctl(m_uinputFd, UI_SET_RELBIT, REL_WHEEL);
     ::ioctl(m_uinputFd, UI_SET_RELBIT, REL_HWHEEL);
+    // Mouse-button capabilities so a diverted button can be re-emitted as a
+    // real pointer button event ("Middle click" action, etc.).
+    ::ioctl(m_uinputFd, UI_SET_KEYBIT, BTN_LEFT);
+    ::ioctl(m_uinputFd, UI_SET_KEYBIT, BTN_MIDDLE);
+    ::ioctl(m_uinputFd, UI_SET_KEYBIT, BTN_RIGHT);
 
     const int keys[] = {
         KEY_LEFTCTRL, KEY_LEFTSHIFT, KEY_LEFTALT, KEY_LEFTMETA,
@@ -142,6 +147,17 @@ void UinputInjector::injectKeystroke(const QString &combo)
     // Release all keys in reverse order
     for (auto it = keys.rbegin(); it != keys.rend(); ++it)
         emitKey(*it, false);
+    emitSync();
+}
+
+void UinputInjector::injectMiddleClick()
+{
+    if (m_uinputFd < 0)
+        return;
+
+    emitKey(BTN_MIDDLE, true);
+    emitSync();
+    emitKey(BTN_MIDDLE, false);
     emitSync();
 }
 

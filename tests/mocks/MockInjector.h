@@ -23,6 +23,10 @@ public:
         m_calls.append({QStringLiteral("injectKeystroke"), combo});
     }
 
+    void injectMiddleClick() override {
+        m_calls.append({QStringLiteral("injectMiddleClick"), {}});
+    }
+
     void injectCtrlScroll(int direction) override {
         m_calls.append({QStringLiteral("injectCtrlScroll"), QString::number(direction)});
     }
